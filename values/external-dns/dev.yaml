@@ -1,0 +1,8 @@
+txtOwnerId: Z041217215OVYNNQT7903
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 64Mi

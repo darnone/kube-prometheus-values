@@ -1,0 +1,33 @@
+# EFS only supports filesystem backup
+schedules:
+  gts-argocd-ci-dev-schedule-fsb:
+    disabled: false
+    schedule: "15 2 * * 1-5"
+    template:
+      csiSnapshotTimeout: 0s
+      defaultVolumesToFsBackup: true
+      ttl: "720h"
+      excludedNamespaces:
+      - velero
+      - default
+      includedNamespaces:
+      - "*"
+      includedResources:
+      - "*"
+    useOwnerReferencesInBackup: "false"
+  
+  # gts-cicd-ci-dev-schedule-fsb:
+  #   disabled: false
+  #   schedule: "15 2 * * 1-5"
+  #   template:
+  #     csiSnapshotTimeout: 0s
+  #     defaultVolumesToFsBackup: true
+  #     ttl: "720h"
+  #     excludedNamespaces:
+  #     - velero
+  #     - default
+  #     includedNamespaces:
+  #     - "*"
+  #     includedResources:
+  #     - "*"
+  #   useOwnerReferencesInBackup: false

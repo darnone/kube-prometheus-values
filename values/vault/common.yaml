@@ -1,0 +1,37 @@
+server:
+  dev:
+    enabled: true
+  nodeSelector:
+    node: base
+  auditStorage:
+    storageClass: gp3-retain
+  dataStorage:
+    storageClass: gp3-retain
+  ingress:
+    enabled: true
+    ingressClassName:
+    pathType: Prefix
+    hosts:
+      - host: vault.example.com
+        paths: []
+    tls: []
+  livenessProbe: false
+  readinessProbe: true
+  logFormat: standard
+  logLevel: info
+
+serverTelemetry:
+  prometheusRules:
+    enabled: true
+  serviceMonitor:
+    enabled: true
+  
+csi:
+  pod:
+    nodeSelector:
+      node: base
+
+injector:
+  nodeSelector: 
+    node: base
+    

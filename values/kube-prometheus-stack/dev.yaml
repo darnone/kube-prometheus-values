@@ -1,0 +1,56 @@
+commonLabels: 
+  app.aegon.io/argocd-app: gts-cicd-dev
+
+# crds:
+#   labels:
+#     app.aegon.io/argocd-app: gts-cicd-dev
+
+prometheus:
+  ingress:
+    hosts:
+      - prometheus.argocd-ci.agtservices-nonprod.aegon.io
+    tls: 
+    - secretName: gts-cicd-prometheus-tls
+      hosts:
+      - prometheus.argocd-ci.agtservices-nonprod.aegon.io
+    prometheusSpec:
+      serviceMonitorSelector:
+        # Note: For all Service Monitors, use a common label
+        matchLabels:
+          release: kube-prometheus-stack
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: 30Gi
+      resources: 
+        limits:
+          memory: 512Mi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+
+grafana:
+  ingress:
+    hosts:
+      - grafana.argocd-ci.agtservices-nonprod.aegon.io
+    tls: 
+    - secretName: gts-cicd-grafana-tls
+      hosts:
+      - grafana.argocd-ci.agtservices-nonprod.aegon.io
+
+  admin:
+    existingSecret: grafana-admin-creds
+    userKey: admin-user
+    passwordKey: admin-password
+
+  persistence:
+    size: 5Gi
+
+  resources: 
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi

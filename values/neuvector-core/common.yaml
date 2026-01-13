@@ -1,0 +1,156 @@
+crdwebhook:
+  enabled: false
+
+lease:
+  enabled: false
+
+# Upon login, neuvector will ask to reset the password but by setting
+# an explicit password, it can be reused as the reset value
+# bootstrapPassword: ""
+
+resources:
+  limits:
+    memory: 2792Mi
+  requests:
+    cpu: 512m
+    memory: 2280Mi
+
+internal: 
+  certmanager: # enable when cert-manager is installed for the internal certificates
+    enabled: true
+
+controller:
+  nodeSelector:
+    node: base
+  internal:
+    certificate:
+      secret: neuvector-internal
+  configmap:
+    enabled: true
+    data:
+      passwordprofileinitcfg.yaml: |
+        # Optional. true or false or empty string(false)
+        always_reload: false
+        active_profile_name: default
+        pwd_profiles:
+        # only default profile is supported.
+        - name: default
+          comment: default config from configMap
+          min_len: 6
+          min_uppercase_count: 1
+          min_lowercase_count: 1
+          min_digit_count: 1
+          min_special_count: 1
+          enable_block_after_failed_login: false
+          block_after_failed_login_count: 5
+          block_minutes: 0
+          enable_password_expiration: false
+          password_expire_after_days: 0
+          enable_password_history: false
+          password_keep_history_count: 0
+          # Optional. value between 30 -- 3600  default 300
+          session_timeout: 300
+  pvc:
+    enabled: true
+    storageClass: neuvector-efs-sc
+    capacity: 2Gi
+  resources:
+    limits:
+      memory: 2792Mi
+    requests:
+      cpu: 512m
+      memory: 2280Mi
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      #alb.ingress.kubernetes.io/group.name: neuvector
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    tls: true
+    secretName: gts-cicd-neuvector-controller-tls
+
+enforcer:
+  enabled: true
+  internal:
+    certificate:
+      secret: neuvector-internal
+  resources:
+    limits:
+      memory: 2792Mi
+    requests:
+      cpu: 512m
+      memory: 2280Mi
+
+manager:
+  enabled: true
+  nodeSelector:
+    node: base
+  env:
+    ssl: false
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      #alb.ingress.kubernetes.io/group.name: neuvector
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    tls: true
+    secretName: gts-cicd-neuvector-manager-tls
+  resources:
+    limits:
+      memory: 2792Mi
+    requests:
+      cpu: 512m
+      memory: 2280Mi
+
+# This is for container registries
+cve:
+  adapter:
+    enabled: true
+    internal:
+      certificate:
+        secret: neuvector-internal
+    nodeSelector:
+      node: base
+    resources:
+      limits:
+        cpu: 400m
+        memory: 1024Mi
+      requests:
+        cpu: 100m
+        memory: 512Mi
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        #alb.ingress.kubernetes.io/group.name: neuvector
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        nginx.ingress.kubernetes.io/backend-protocol: HTTP
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      tls: true
+      secretName: gts-cicd-neuvector-cve-tls
+  updater:
+    nodeSelector:
+      node: base
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  scanner:
+    nodeSelector:
+      node: base
+    internal:
+      certificate:
+        secret: neuvector-internal
+    resources:
+      limits:
+        memory: 2792Mi
+      requests:
+        cpu: 512m
+        memory: 2280Mi

@@ -1,0 +1,7 @@
+linux:
+  nodeSelector: base
+
+syncSecret:
+  enabled: "true"
+
+enableSecretRotation: "true"

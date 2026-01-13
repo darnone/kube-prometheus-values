@@ -1,0 +1,10 @@
+exporter:
+  enabled: true
+  ctrlSecretName: neuvector-monitor-secret
+  enforcerStats:
+    enabled: true
+  grafanaDashboard:
+    enabled: true
+    namespace: monitoring
+    annotations: 
+      argocd_grafana_folder: "Security"

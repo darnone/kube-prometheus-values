@@ -1,0 +1,21 @@
+reloader:
+  enableMetricsByNamespace: true
+  reloadStrategy: annotations
+  deployment:
+    nodeSelector:
+      node: base
+    resources:
+      limits:
+        cpu: "100m"
+        memory: "512Mi"
+      requests:
+        cpu: "10m"
+        memory: "128Mi"
+    serviceAccount:
+      # Specifies whether a ServiceAccount should be created
+      create: true
+      labels:
+        provider: stakater
+        group: com.stakater.platform
+        version: v1.4.2
+      name: reloader-sa

@@ -1,0 +1,25 @@
+node:
+  enabled: true
+  cleanupOnly: false
+  daemonset:
+    resources:
+      limits:
+        ephemeral-storage: 256Mi
+        memory: 750Mi
+      requests:
+        cpu: 250m
+        ephemeral-storage: 256Mi
+        memory: 750Mi
+  image:
+    repository: 154241962249.dkr.ecr.us-east-1.amazonaws.com/argocd/crowdstrike/falcon-sensor
+    tag: 7.27.0-18003-1.falcon-linux.Release.US-2
+
+falcon:
+  cid: null
+
+falconSecret:
+  enabled: true
+  secretName: falcon-sensor-cid-secret
+
+container:
+  enabled: false

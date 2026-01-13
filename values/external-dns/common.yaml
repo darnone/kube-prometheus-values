@@ -1,0 +1,24 @@
+nodeSelector:
+  node: base
+
+provider:
+  name: aws
+env:
+  - name: AWS_DEFAULT_REGION
+    value: us-east-1 # change to region where EKS is installed
+
+sources: [ingress, service]
+
+serviceMonitor:
+  enabled: true
+  namespace: "monitoring"
+  selector:
+    app.kubernetes.io/instance: external-dns
+    app.kubernetes.io/name: external-dns
+    app.kubernetes.io/part-of: kube-prometheus-stack
+    release: kube-prometheus-stack
+  labels:
+    app.kubernetes.io/instance: external-dns
+    app.kubernetes.io/part-of: kube-prometheus-stack
+    release: kube-prometheus-stack
+  #jobLabel: "app.kubernetes.io/instance"

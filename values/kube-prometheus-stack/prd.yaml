@@ -1,0 +1,52 @@
+commonLabels: 
+  app.aegon.io/argocd-app: gts-cicd-prd
+
+# crds:
+#   labels:
+#     app.aegon.io/argocd-app: gts-cicd-prd
+  
+prometheus:
+  ingress:
+    hosts:
+      - prometheus.argocd-ci.agtservices.aegon.io
+    tls: 
+    - secretName: gts-cicd-prometheus-tls
+      hosts:
+      - prometheus.argocd-ci.agtservices.aegon.io
+    prometheusSpec:
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: 50Gi
+      resources: 
+        limits:
+          memory: 512Mi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+
+grafana:
+  ingress:
+    hosts:
+      - grafana.argocd-ci.agtservices.aegon.io
+    tls: 
+    - secretName: gts-cicd-grafana-tls
+      hosts:
+      - grafana.argocd-ci.agtservices.aegon.io
+  
+  admin:
+    existingSecret: grafana-admin-creds
+    userKey: admin-user
+    passwordKey: admin-password
+  
+  persistence:
+    size: 10Gi
+
+  resources: 
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 200m
+      memory: 128Mi

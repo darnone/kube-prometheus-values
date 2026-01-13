@@ -1,0 +1,4 @@
+openshift: false
+
+crdwebhook:
+  type: ClusterIP

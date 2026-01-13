@@ -1,0 +1,34 @@
+nodeSelector:
+  node: base
+
+webhook:
+  nodeSelector:
+    node: base
+  serviceAccount:
+    create: false
+
+cainjector:
+  nodeSelector:
+    node: base
+  serviceAccount:
+    create: false
+
+startupapicheck:
+  nodeSelector:
+    node: base
+  serviceAccount:
+    create: false
+
+crds:
+  enabled: true
+  keep: true
+
+prometheus:
+  enabled: true
+  servicemonitor:
+    enabled: true
+    namespace: monitoring
+    labels:
+      app.kubernetes.io/instance: cert-manager
+      app.kubernetes.io/part-of: kube-prometheus-stack
+      release: kube-prometheus-stack

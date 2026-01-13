@@ -1,0 +1,15 @@
+nodeSelector:
+  node: base
+
+region: us-east-1
+
+ingressClassParams:
+  create: "true"
+
+serviceMonitor:
+  enabled: "true"
+  namespace: monitoring
+  additionalLabels: 
+    app.kubernetes.io/part-of: kube-prometheus-stack
+    release: kube-prometheus-stack
+  interval: 30s

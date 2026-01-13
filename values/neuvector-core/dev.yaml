@@ -1,0 +1,14 @@
+controller:
+  ingress:
+    host: neuvector-controller-restapi.argocd-ci.agtservices-nonprod.aegon.io
+
+manager:
+  ingress: 
+    host: neuvector.argocd-ci.agtservices-nonprod.aegon.io
+
+cve:
+  adapter:
+    ingress: 
+      host: neuvector-cve.agtservices-nonprod.aegon.io
+    
+    

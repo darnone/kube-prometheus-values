@@ -1,0 +1,25 @@
+image:
+  repository: 154241962249.dkr.ecr.us-east-1.amazonaws.com/argocd/crowdstrike/falcon-kac
+  tag: 7.29.0-2704.Release.US-2
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/arch
+          operator: In
+          values:
+          - amd64
+      - matchExpressions:
+        - key: node
+          operator: In
+          values:
+          - base
+
+falcon:
+  cid: null
+
+falconSecret:
+  enabled: true
+  secretName: falcon-kac-cid-secret
