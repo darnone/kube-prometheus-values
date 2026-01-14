@@ -1,0 +1,318 @@
+crds:
+  enabled: false
+
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      node: base
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3-retain
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+#   ingress:
+#     enabled: true
+#     ingressClassName: nginx
+#     annotations:
+#       alb.ingress.kubernetes.io/group.name: tools-monitoring
+#       cert-manager.io/cluster-issuer: letsencrypt-production
+#       nginx.ingress.kubernetes.io/backend-protocol: HTTP
+#       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+#     pathType: Prefix
+
+kube-state-metrics:
+  nodeSelector:
+    node: base
+
+prometheusOperator:
+  nodeSelector:
+    node: base
+  admissionWebhooks:
+    deployment:
+      nodeSelector:
+        node: base
+    resources:
+      limits:
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+    patch:
+      nodeSelector:
+        node: base
+
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      alb.ingress.kubernetes.io/group.name: tools-monitoring
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    pathType: Prefix
+
+  prometheusSpec:
+    nodeSelector:
+      node: base
+
+    additionalScrapeConfigs:
+    - job_name: nv-exporter
+      scrape_interval: 30s
+      static_configs:
+        - targets: ["neuvector-prometheus-exporter.neuvector:8068"]
+
+    serviceMonitorSelector:
+      # Note: For all Service Monitors, use a common label
+      matchLabels:
+        release: kube-prometheus-stack
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3-retain
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 30Gi
+
+grafana:
+  nodeSelector:
+    node: base
+  annotations:
+    reloader.stakater.com/auto: "true"
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      alb.ingress.kubernetes.io/group.name: tools-monitoring
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    pathType: Prefix
+
+  persistence:
+    enabled: true
+    storageClassName: gp3-retain
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      folderAnnotation: "argocd_grafana_folder"
+      provider:
+        foldersFromFilesStructure: true
+
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: "default"
+          orgId: 1
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+        - name: "kubernetes"
+          orgId: 1
+          folder: "Kubernetes"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/kubernetes
+        - name: "argocd"
+          orgId: 1
+          folder: "Argo CD"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/argocd
+        - name: "authentication"
+          orgId: 1
+          folder: "Authentication"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/authentication
+        - name: "cicd-tools"
+          orgId: 1
+          folder: "CI/CD Tools"
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/cicd-tools
+        - name: "ingress"
+          orgId: 1
+          folder: "Ingress"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/ingress
+        - name: "metrics"
+          orgId: 1
+          folder: "Metrics"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/metrics
+        - name: "policy"
+          orgId: 1
+          folder: "Policy"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/policy
+        - name: "scaling"
+          orgId: 1
+          folder: "Scaling"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/scaling
+        - name: "security"
+          orgId: 1
+          folder: "Security"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/security
+        - name: "velero"
+          orgId: 1
+          folder: "Backups"
+          type: file
+          disableDeletion: true
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/velero
+  dashboards:
+    kubernetes:
+      k8s-system-api-server:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json
+        datasource: Prometheus
+        token: ""
+      k8s-system-coredns:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json
+        datasource: Prometheus
+        token: ""
+      k8s-views-global:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
+        datasource: Prometheus
+        token: ""
+      k8s-views-namespaces:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
+        datasource: Prometheus
+        token: ""
+      k8s-views-nodes:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
+        datasource: Prometheus
+        token: ""
+      k8s-views-pods:
+        url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
+        datasource: Prometheus
+        token: ""
+      etcd:
+        gnetId: 3070
+        datasource: Prometheus
+    default:
+      node-exporter-full:
+        datasource: Prometheus
+        url: https://grafana.com/api/dashboards/1860/revisions/22/download
+    argocd:
+      argocd-application-overview:
+        url: https://grafana.com/api/dashboards/19974/revisions/3/download
+        datasource: Prometheus
+        token: ""
+      argocd-operational-overview:
+        url: https://grafana.com/api/dashboards/19993/revisions/3/download
+        datasource: Prometheus
+        token: ""
+      argocd-notifications-overview:
+        url: https://grafana.com/api/dashboards/19975/revisions/3/download
+        datasource: Prometheus
+        token: ""
+    authentication:
+    cicd-tools:
+      nexus-metrics:
+        url: https://grafana.com/api/dashboards/16459/revisions/1/download
+        datasource: Prometheus
+        token: ""
+      nexus-blobs:
+        url: https://grafana.com/api/dashboards/19842/revisions/1/download
+        datasource: Prometheus
+        token: ""
+      sonarqube-analysis:
+        url: https://raw.githubusercontent.com/SonarSource/helm-chart-sonarqube/refs/heads/master/examples/grafana/sonarqube-dashboard.json
+        datasource: Prometheus
+        token: ""
+    ingress:
+      aws-loadbalancer-controller:
+        url: https://grafana.com/api/dashboards/18319/revisions/2/download
+        datasource: Prometheus
+        token: ""
+      aws-network-loadbalancer:
+        url: https://grafana.com/api/dashboards/12111/revisions/2/download
+        datasource: Prometheus
+        token: ""
+      cert-manager:
+        url: https://grafana.com/api/dashboards/20842/revisions/3/download
+        datasource: Prometheus
+        token: ""
+      external-dns:
+        url: https://grafana.com/api/dashboards/15038/revisions/3/download
+        datasource: Prometheus
+        token: ""
+    metrics:
+      metrics-pods:
+        url: https://grafana.com/api/dashboards/19451/revisions/5/download
+        datasource: Prometheus
+        token: ""
+      metrics-app-resource:
+        url: https://grafana.com/api/dashboards/12363/revisions/1/download
+        datasource: Prometheus
+        token: ""
+    policy:
+      kyverno:
+        url: https://grafana.com/api/dashboards/15987/revisions/2/download
+        datasource: Prometheus
+        token: ""
+    scaling:
+      cluster-autoscaler:
+        url: https://grafana.com/api/dashboards/3831/revisions/1/download
+        datasource: Prometheus
+        token: ""
+      HPA1:
+        url: https://grafana.com/api/dashboards/10257/revisions/1/download
+        datasource: Prometheus
+        token: ""
+      HPA2:
+        url: https://grafana.com/api/dashboards/22128/revisions/11/download
+        datasource: Prometheus
+        token: ""
+    security:
+      external-secrets:
+        url: https://raw.githubusercontent.com/external-secrets/external-secrets/main/docs/snippets/dashboard.json
+        datasource: Prometheus
+        token: ""
+    velero:
+      velero-backups:
+        url: https://grafana.com/api/dashboards/16829/revisions/latest/download
+        datasource: Prometheus
+        token: ""
